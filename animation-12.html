@@ -1,0 +1,36 @@
+<div id="block" style="width: 100px; height: 100px; background-color: red;">
+    click me, i will run!
+</div>
+
+<script src="./Animator.js"></script>
+<script src="./AnimationQueue.js"></script>
+<script>
+    let a1 = new Animator(1000, function(p) {
+        let tx = 100 * p
+
+        block.style.transform = `translateX(${tx}px)`
+    })
+
+    let a2 = new Animator(1000, function(p) {
+        let ty = 100 * p
+
+        block.style.transform = `translate(100px, ${ty}px)`
+    })
+
+    let a3 = new Animator(1000, function(p) {
+        let tx = 100 * (1 - p)
+        block.style.transform = `translate(${tx}px, 100px)`
+    })
+
+    let a4 = new Animator(1000, function(p) {
+        let ty = 100 * (1 - p)
+        block.style.transform = `translateY(${ty}px)`
+    })
+
+    block.addEventListener('click', function() {
+        let animators = new AnimationQueue()
+        animators.append(a1, a2, a3, a4)
+        animators.flush()
+    })
+</script>
+

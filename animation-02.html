@@ -1,0 +1,19 @@
+<div id="block" style="width: 100px; height: 100px; background-color: red;">
+    click me, i will run!
+</div>
+<script>
+    let block = document.getElementById('block')
+    block.addEventListener('click', function() {
+        console.log('===== moving =====')
+        let self = this
+        let startTime = Date.now()
+        let distance = 200, T = 2000
+
+        requestAnimationFrame(function step() {
+            let p = Math.min(1.0, (Date.now() - startTime) / T)
+            let tx = distance * p * p
+            self.style.transform = `translateX(${tx}px)` // 加速的关键
+            if (p < 1.0) requestAnimationFrame(step)
+        })
+    }, false)
+</script>

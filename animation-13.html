@@ -1,0 +1,37 @@
+<div id="block" style="width: 100px; height: 100px; background-color: red;">
+    click me, i will run!
+</div>
+
+<script src="./Animator.js"></script>
+<script src="./AnimationQueue.js"></script>
+<script>
+block.addEventListener('click', function(){
+  let T = 1414;
+
+  let a1 = new Animator(T,  function(p){
+    let s = this.duration * 200 / T;
+    let ty = s * (p * p - 1);
+    block.style.transform = `translateY(${ty}px)`;     
+  });
+
+  let a2 = new Animator(T,  function(p){
+    let s = this.duration * 200 / T;
+    let ty = - s * p * (2-p);
+    block.style.transform = `translateY(${ty}px)`;     
+  });
+
+let animators = new AnimationQueue();
+  function foo(){
+    a2.duration *= 0.7;
+    if(a2.duration <= 0.0001){
+      console.log('done');
+      animators.animators.length = 0;
+    }
+  }
+  animators.append(a1 ,foo, a2, function b(){
+    a1.duration *= 0.7;
+    this.append(a1, foo, a2, b);
+  });
+  animators.flush();
+});
+</script>

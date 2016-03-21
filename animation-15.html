@@ -1,0 +1,28 @@
+<div id="block" style="width: 100px; height: 100px; background-color: red;">
+    click me, i will run!
+</div>
+
+<script src="./Animator.js"></script>
+<script src="./AnimationQueue.js"></script>
+<script>
+    let a1 = new Animator(2800, function(p) {
+        let x = -100 * Math.sin(2.8 * Math.PI * p)
+        let y = 100 - 100 * Math.cos(2.8 * Math.PI * p)
+
+        block.style.transform = `translate(${x}px, ${y}px)`
+    })
+
+    let a2 = new Animator(5000, function(p) {
+        let x = -100 * Math.sin(2.8 * Math.PI) - 100 * Math.cos(2.8 * Math.PI) * Math.PI * 5 * p
+
+        let y = 100 - 100 * Math.cos(2.8 * Math.PI) + 100 * Math.sin(2.8 * Math.PI) * Math.PI * 5 * p
+
+        block.style.transform = `translate(${x}px, ${y}px)`
+    })
+
+    block.addEventListener('click', function() {
+        a1.start(function(){
+            a2.start()
+        })
+    })
+</script>

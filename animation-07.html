@@ -1,0 +1,21 @@
+<div id="block" style="width: 100px; height: 100px; background-color: red;">
+    click me, i will run!
+</div>
+<script>
+    let block = document.getElementById('block')
+    block.addEventListener('click', function() { // 此处不可用箭头函数，会绑定this为全局this
+        console.log('trigger me moving!')
+        let self = this
+        let startTime = Date.now()
+        let distance = 100, T = 2000
+        
+        requestAnimationFrame(function step() {
+            let p = Math.min(1.0, (Date.now() - startTime) / T)
+            let ty = distance * Math.sin(2 * Math.PI * p)
+            let tx = 2 * distance * p
+
+            self.style.transform = `translate(${tx}px, ${ty}px)`
+            if (p < 1.0) requestAnimationFrame(step)
+        })
+    }, false)
+</script>

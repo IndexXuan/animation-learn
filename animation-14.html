@@ -1,0 +1,19 @@
+<div id="block" style="width: 100px; height: 100px; background-color: red;">
+    click me, i will run!
+</div>
+
+<script src="./Animator.js"></script>
+<script src="./AnimationQueue.js"></script>
+<script>
+    let a1 = new Animator(4000, function(p) {
+        let rotation = `rotate(${720 * p}deg)`
+        let x = 50 + 314 * p + 'px'
+
+        block.style.transform = rotation;
+        block.style.left = x
+    })
+
+    block.addEventListener('click', function() {
+        a1.start()
+    })
+</script>

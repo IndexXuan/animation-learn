@@ -1,0 +1,17 @@
+<div id="block" style="width: 100px; height: 100px; background-color: red;">
+    click me, i will run!
+</div>
+
+<script src="./Animator.js"></script>
+<script>
+    let animator = new Animator(2000, (p) => {
+        let tx = -100 * Math.sin(2 * Math.PI * p),
+            ty = -100 * Math.cos(2 * Math.PI * p)
+
+        block.style.transform = `translate(${tx}px, ${ty}px)`
+    })
+
+    block.addEventListener('click', function() {
+        animator.start(false)
+    })
+</script>
