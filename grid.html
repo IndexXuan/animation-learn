@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Vue Component Grid</title>
+<style>
+
+body {
+  font-family: Helvetica Neue, Arial, sans-serif;
+  font-size: 14px;
+  color: #444;
+}
+
+table {
+  border: 2px solid #42b983;
+  border-radius: 3px;
+  background-color: #fff;
+}
+
+th {
+  background-color: #42b983;
+  color: rgba(255,255,255,0.66);
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -user-select: none;
+}
+
+td {
+  background-color: #f9f9f9;
+}
+
+th, td {
+  min-width: 120px;
+  padding: 10px 20px;
+}
+
+th.active {
+  color: #fff;
+}
+
+th.active .arrow {
+  opacity: 1;
+}
+
+.arrow {
+  display: inline-block;
+  vertical-align: middle;
+  width: 0;
+  height: 0;
+  margin-left: 5px;
+  opacity: 0.66;
+}
+
+.arrow.asc {
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 4px solid #fff;
+}
+
+.arrow.dsc {
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid #fff;
+}
+
+#search {
+  margin-bottom: 10px;
+}
+
+</style>
+</head>
+<body>
+    <template id="grid-template">
+        <table>
+          <thead>
+            <tr>
+                <th v-for="key in columns"
+                    @click="sortBy(key)"
+                    :class="{active: sortKey == key}">
+                        {{ key | toName }}
+                    <span class="arrow"
+                          :class="sortOrders[key] > 0 ? 'asc' : 'dsc'">
+                    </span>
+                </th>
+            </tr>
+          </thead>
+          <tbody>
+          <!-- 制作表格的关键，行循环，再填每一行的列 -->
+          <tr v-for="
+              entry in data
+              | filterBy filterKey
+              | orderBy sortKey sortOrders[sortKey]" track-by="rankId"> <!-- 性能优化手段 -->
+                <td v-for="key in columns">
+                     {{ entry[key] }}
+                </td>
+            </tr>
+          </tbody>
+        </table>
+    </template>
+
+    <div id="rankDataGrid">
+        <form id="search">
+            Search <input type="text" name="query" v-model="searchQuery">
+        </form>
+        <data-grid
+            :data="gridData"
+            :columns="gridColumns"
+            :filter-key="searchQuery">
+        </data-grid>
+    </div>
+    <script src="./vue.js"></script>
+    <script src="./grid-component.js"></script>
+    <script>
+        // TODO: 确定键名,做相应更改
+        // 标题中文名与key映射表, 用于filter
+        var labelObj = {
+            rankId: 'Rand排位', 
+            people: '曝光人数', 
+            num: '曝光次数', 
+            click: '点击人数', 
+            clickNum: '点击次数', 
+            orders: '订单',
+            water: '流水', 
+            transfer: '转化'
+        };
+
+        // 注册一个新的filter, 用来转化key => 中文名, 便于人阅读
+        Vue.filter('toName', function(key) {
+            var keys = Object.keys(labelObj);
+            for (var i = 0, len = keys.length; i < len; i++) {
+                if (key === keys[i]) {
+                    return labelObj[key];
+                }
+            }
+        });
+
+        // 实例化Grid组件, 并传入数据
+        var rankGrid = new Vue({
+            el: '#rankDataGrid',
+            data: {
+                searchQuery: '',
+                // 此处必须有完整的key来实例化，否则会错过实例化过程中的一些初始化
+                gridColumns: ['rankId', 'people', 'num', 'click', 'clickNum', 'orders','water', 'transfer'],
+                gridData: []
+            }
+        })
+
+        setTimeout(function() {
+            // 模拟异步加载，此处不需要挂载在vm.data上, 一个小语法注意点
+            var data = [
+                { rankId: 1, people: 1004, num: 1, click: 2, clickNum: 1342, orders: 100324, water: 321, transfer: 100 },
+                { rankId: 2, people: 1003, num: 10, click: 20, clickNum: 132, orders: 124, water: 391, transfer: 180 },
+                { rankId: 3, people: 1002, num: 1000, click: 200, clickNum: 142, orders: 1324, water: 301, transfer: 105 },
+                { rankId: 4, people: 1001, num: 10000, click: 2000, clickNum: 342, orders: 10324, water: 121, transfer: 190 },
+                { rankId: 5, people: 1004, num: 1, click: 2, clickNum: 1342, orders: 100324, water: 321, transfer: 100 },
+                { rankId: 6, people: 1003, num: 10, click: 20, clickNum: 132, orders: 124, water: 391, transfer: 180 },
+                { rankId: 7, people: 1002, num: 1000, click: 200, clickNum: 142, orders: 1324, water: 301, transfer: 105 },
+                { rankId: 8, people: 1001, num: 10000, click: 2000, clickNum: 342, orders: 10324, water: 121, transfer: 190 },
+                { rankId: 9, people: 1004, num: 1, click: 2, clickNum: 1342, orders: 100324, water: 321, transfer: 100 },
+                { rankId: 10, people: 1003, num: 10, click: 20, clickNum: 132, orders: 124, water: 391, transfer: 180 },
+                { rankId: 11, people: 1002, num: 1000, click: 200, clickNum: 142, orders: 1324, water: 301, transfer: 105 },
+                { rankId: 12, people: 1001, num: 10000, click: 2000, clickNum: 342, orders: 10324, water: 121, transfer: 190 },
+                { rankId: 13, people: 1004, num: 1, click: 2, clickNum: 1342, orders: 100324, water: 321, transfer: 100 },
+                { rankId: 14, people: 1003, num: 10, click: 20, clickNum: 132, orders: 124, water: 391, transfer: 180 },
+                { rankId: 15, people: 1002, num: 1000, click: 200, clickNum: 142, orders: 1324, water: 301, transfer: 105 },
+                { rankId: 16, people: 1001, num: 10000, click: 2000, clickNum: 342, orders: 10324, water: 121, transfer: 190 },
+                { rankId: 17, people: 1004, num: 1, click: 2, clickNum: 1342, orders: 100324, water: 321, transfer: 100 },
+                { rankId: 18, people: 1003, num: 10, click: 20, clickNum: 132, orders: 124, water: 391, transfer: 180 },
+                { rankId: 19, people: 1002, num: 1000, click: 200, clickNum: 142, orders: 1324, water: 301, transfer: 105 },
+                { rankId: 20, people: 1001, num: 10000, click: 2000, clickNum: 342, orders: 10324, water: 121, transfer: 190 },
+                { rankId: 21, people: 1004, num: 1, click: 2, clickNum: 1342, orders: 100324, water: 321, transfer: 100 },
+                { rankId: 22, people: 1003, num: 10, click: 20, clickNum: 132, orders: 124, water: 391, transfer: 180 },
+                { rankId: 23, people: 1002, num: 1000, click: 200, clickNum: 142, orders: 1324, water: 301, transfer: 105 },
+                { rankId: 24, people: 1001, num: 10000, click: 2000, clickNum: 342, orders: 10324, water: 121, transfer: 190 },
+                { rankId: 25, people: 1004, num: 1, click: 2, clickNum: 1342, orders: 100324, water: 321, transfer: 100 },
+                { rankId: 26, people: 1003, num: 10, click: 20, clickNum: 132, orders: 124, water: 391, transfer: 180 },
+                { rankId: 27, people: 1002, num: 1000, click: 200, clickNum: 142, orders: 1324, water: 301, transfer: 105 },
+                { rankId: 28, people: 1001, num: 10000, click: 2000, clickNum: 342, orders: 10324, water: 121, transfer: 190 },
+                { rankId: 29, people: 1004, num: 1, click: 2, clickNum: 1342, orders: 100324, water: 321, transfer: 100 },
+                { rankId: 30, people: 1003, num: 10, click: 20, clickNum: 132, orders: 124, water: 391, transfer: 180 },
+                { rankId: 31, people: 1002, num: 1000, click: 200, clickNum: 142, orders: 1324, water: 301, transfer: 105 },
+                { rankId: 32, people: 1001, num: 10000, click: 2000, clickNum: 342, orders: 10324, water: 121, transfer: 190 },
+                { rankId: 33, people: 1004, num: 1, click: 2, clickNum: 1342, orders: 100324, water: 321, transfer: 100 },
+                { rankId: 34, people: 1003, num: 10, click: 20, clickNum: 132, orders: 124, water: 391, transfer: 180 },
+                { rankId: 35, people: 1002, num: 1000, click: 200, clickNum: 142, orders: 1324, water: 301, transfer: 105 },
+                { rankId: 36, people: 1001, num: 10000, click: 2000, clickNum: 342, orders: 10324, water: 121, transfer: 190 },
+                { rankId: 37, people: 1004, num: 1, click: 2, clickNum: 1342, orders: 100324, water: 321, transfer: 100 },
+                { rankId: 38, people: 1003, num: 10, click: 20, clickNum: 132, orders: 124, water: 391, transfer: 180 },
+                { rankId: 39, people: 1001, num: 10000, click: 2000, clickNum: 342, orders: 10324, water: 121, transfer: 190 },
+                { rankId: 40, people: 1004, num: 1, click: 2, clickNum: 1342, orders: 100324, water: 321, transfer: 100 },
+                { rankId: 41, people: 1003, num: 10, click: 20, clickNum: 132, orders: 124, water: 391, transfer: 180 },
+                { rankId: 42, people: 1002, num: 1000, click: 200, clickNum: 142, orders: 1324, water: 301, transfer: 105 },
+                { rankId: 43, people: 1001, num: 10000, click: 2000, clickNum: 342, orders: 10324, water: 121, transfer: 190 },
+                { rankId: 44, people: 1004, num: 1, click: 2, clickNum: 1342, orders: 100324, water: 321, transfer: 100 },
+                { rankId: 45, people: 1003, num: 10, click: 20, clickNum: 132, orders: 124, water: 391, transfer: 180 },
+                { rankId: 46, people: 1002, num: 1000, click: 200, clickNum: 142, orders: 1324, water: 301, transfer: 105 },
+                { rankId: 47, people: 1001, num: 10000, click: 2000, clickNum: 342, orders: 10324, water: 121, transfer: 190 },
+                { rankId: 48, people: 1004, num: 1, click: 2, clickNum: 1342, orders: 100324, water: 321, transfer: 100 },
+                { rankId: 49, people: 1003, num: 10, click: 20, clickNum: 132, orders: 124, water: 391, transfer: 180 },
+                { rankId: 50, people: 1002, num: 1000, click: 200, clickNum: 142, orders: 1324, water: 301, transfer: 105 },
+            ];
+            if (data.length >= 1) {
+                rankGrid.gridData = data;
+            } else {
+                console.error('no data!');
+            }
+        }, 10)
+
+    </script>
+</body>
+</html>
